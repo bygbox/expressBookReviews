@@ -3,6 +3,7 @@ let books = require("./booksdb.js");
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
+const axios = require("axios");
 
 public_users.post("/register", (req, res) => {
   const username = req.body.username;
@@ -37,6 +38,17 @@ public_users.get("/", function (req, res) {
   return res.status(200).json({ books: books });
 });
 
+// Get the book list available in the shop via async axios
+public_users.get("/async", async function (req, res) {
+  try {
+    const response = await axios.get("http://localhost:5000/");
+    console.log("public_users.get(/async)", response.data);
+    return res.status(200).json(response.data);
+  } catch (err) {
+    return res.status(400).json(err);
+  }
+});
+
 // Get book details based on ISBN
 public_users.get("/isbn/:isbn", function (req, res) {
   let isbn = req.params.isbn;
@@ -47,10 +59,24 @@ public_users.get("/isbn/:isbn", function (req, res) {
       .status(404)
       .json({ message: "Error: ISBN is missing or out of range!" });
   }
-  return res.status(300).json(book);
+  console.log("public_users.get(/isbn/:isbn)", JSON.stringify(book));
+  return res.status(200).json(book);
 });
 
-// Get book details based on author
+// async Get book details based on ISBN
+public_users.get("/async/isbn/:isbn", function (req, res) {
+  let isbn = req.params.isbn;
+  console.log("public_users.get(/async/isbn/:isbn)", isbn);
+  axios
+    .get(`http://localhost:5000/isbn/${isbn}`)
+    .then((response) => {
+      console.log("public_users.get(/async/isbn/:isbn).then", response.data);
+      res.status(200).json(response.data);
+    })
+    .catch((err) => res.status(400).json(err));
+});
+
+// Get all books based on author
 public_users.get("/author/:author", function (req, res) {
   let author = req.params.author;
   let authorBooks = [];
@@ -64,6 +90,22 @@ public_users.get("/author/:author", function (req, res) {
       authorBooks.push({ isbn: isbn, ...b });
   }
   return res.status(200).json({ booksbyauthor: authorBooks });
+});
+
+// async Get all books based on author
+public_users.get("/async/author/:author", function (req, res) {
+  let author = req.params.author;
+  console.log("public_users.get(/async/author/:author)", author);
+  axios
+    .get(`http://localhost:5000/author/${author}`)
+    .then((response) => {
+      console.log(
+        "public_users.get(/async/author/:author).then",
+        response.data
+      );
+      res.status(200).json(response.data);
+    })
+    .catch((err) => res.status(400).json(err));
 });
 
 // Get all books based on title
@@ -80,6 +122,19 @@ public_users.get("/title/:title", function (req, res) {
       titleBooks.push({ isbn: isbn, ...b });
   }
   return res.status(200).json({ booksbytitle: titleBooks });
+});
+
+// async Get all books based on title
+public_users.get("/async/title/:title", function (req, res) {
+  let title = req.params.title;
+  console.log("public_users.get(/async/title/:title)", title);
+  axios
+    .get(`http://localhost:5000/title/${title}`)
+    .then((response) => {
+      console.log("public_users.get(/async/title/:title).then", response.data);
+      res.status(200).json(response.data);
+    })
+    .catch((err) => res.status(400).json(err));
 });
 
 //  Get book review
