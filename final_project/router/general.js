@@ -12,24 +12,13 @@ public_users.post("/register", (req, res) => {
   if (!!username && !!password) {
     if (!isValid(username)) {
       users.push({ username: username, password: password });
-      console.log(
-        `pubus.post(/register): 200: username: '${username}' password: '${password}' registered!`,
-        "users:\n",
-        users
-      );
       return res.status(200).json({
         message: "Customer successfully registered. You can login now!",
       });
     } else {
-      console.log(
-        `pubus.post(/register): 409: username: '${username}' already exists!`
-      );
       return res.status(409).json({ message: "Customer already exists!" });
     }
   }
-  console.log(
-    `pubus.post(/register): 412: username: '${username}' and/or password: '${password}' is missing!`
-  );
   return res.status(412).json({ message: "Unable to register the customer." });
 });
 
@@ -42,7 +31,6 @@ public_users.get("/", function (req, res) {
 public_users.get("/async", async function (req, res) {
   try {
     const response = await axios.get("http://localhost:5000/");
-    console.log("public_users.get(/async)", response.data);
     return res.status(200).json(response.data);
   } catch (err) {
     return res.status(400).json(err);
@@ -59,18 +47,15 @@ public_users.get("/isbn/:isbn", function (req, res) {
       .status(404)
       .json({ message: "Error: ISBN is missing or out of range!" });
   }
-  console.log("public_users.get(/isbn/:isbn)", JSON.stringify(book));
   return res.status(200).json(book);
 });
 
 // async Get book details based on ISBN
 public_users.get("/async/isbn/:isbn", function (req, res) {
   let isbn = req.params.isbn;
-  console.log("public_users.get(/async/isbn/:isbn)", isbn);
   axios
     .get(`http://localhost:5000/isbn/${isbn}`)
     .then((response) => {
-      console.log("public_users.get(/async/isbn/:isbn).then", response.data);
       res.status(200).json(response.data);
     })
     .catch((err) => res.status(400).json(err));
@@ -95,14 +80,9 @@ public_users.get("/author/:author", function (req, res) {
 // async Get all books based on author
 public_users.get("/async/author/:author", function (req, res) {
   let author = req.params.author;
-  console.log("public_users.get(/async/author/:author)", author);
   axios
     .get(`http://localhost:5000/author/${author}`)
     .then((response) => {
-      console.log(
-        "public_users.get(/async/author/:author).then",
-        response.data
-      );
       res.status(200).json(response.data);
     })
     .catch((err) => res.status(400).json(err));
@@ -127,11 +107,9 @@ public_users.get("/title/:title", function (req, res) {
 // async Get all books based on title
 public_users.get("/async/title/:title", function (req, res) {
   let title = req.params.title;
-  console.log("public_users.get(/async/title/:title)", title);
   axios
     .get(`http://localhost:5000/title/${title}`)
     .then((response) => {
-      console.log("public_users.get(/async/title/:title).then", response.data);
       res.status(200).json(response.data);
     })
     .catch((err) => res.status(400).json(err));

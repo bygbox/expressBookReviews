@@ -30,14 +30,8 @@ regd_users.post("/login", (req, res) => {
   const password = req.body.password;
 
   if (!username || !password) {
-    console.log(
-      `regus.post(/login): 412: username: '${username}' and/or password: '${password}' is missing!`
-    );
     return res.status(412).json({ message: "Error logging in" });
   }
-  console.log(
-    `regus.post(/login): username: '${username}' password: '${password}'`
-  );
   if (authenticatedUser(username, password)) {
     let accessToken = jwt.sign(
       {
@@ -52,17 +46,8 @@ regd_users.post("/login", (req, res) => {
       accessToken,
       username,
     };
-    console.log(
-      `regus.post(/login): 200: username: '${username}' password: '${password}' logged in!`
-    );
-    console.log("regus.post(/login):accessToken:", accessToken);
-    console.log("regus.post(/login):req.ses.authz:", req.session.authorization);
     return res.status(200).send("Customer successfully logged in.");
   } else {
-    console.log(
-      `regus.post(/login): 401: username: '${username}' password: '${password}' invalid creds!`
-    );
-
     return res
       .status(401)
       .json({ message: "Invalid Login. Check username and password!" });
@@ -75,10 +60,6 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
   let isbn = req.params.isbn;
   let review = req.query.review;
   let book = !!isbn ? books[isbn] : undefined;
-  console.log(
-    `regd_users.put(/auth/review/:isbn) BEF: user:${user} isbn:${isbn} review:'${review}' book:`,
-    book
-  );
   if (!user) {
     return res.status(404).json({
       message: "Error: Customer not logged in! [username not present!]",
@@ -94,10 +75,6 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
   }
   let bRev = book["reviews"];
   bRev[user] = review;
-  console.log(
-    `regd_users.put(/auth/review/:isbn) AFT: user:${user} isbn:${isbn} review:'${review}' book:`,
-    book
-  );
 
   return res
     .status(200)
