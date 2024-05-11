@@ -25,25 +25,12 @@ app.use("/customer/auth/*", function auth(req, res, next) {
       //Use JWT to verify token
       if (!err) {
         req.user = user;
-
-        console.log(
-          `app.use(/customer/auth): 200: user:'${user.usr}'/pwd:'${user.pwd}' is authenticated!`,
-          "user obj:",
-          user,
-          "req.session.authorization obj:",
-          req.session.authorization
-        );
         next();
       } else {
-        console.log(
-          `app.use(/customer/auth): 403: user: '${user}' not authenticated!`,
-          user
-        );
         return res.status(403).json({ message: "Customer not authenticated" });
       }
     });
   } else {
-    console.log(`app.use(/customer/auth): 403: Customer: ????? not logged in!`);
     return res.status(403).json({ message: "Customer not logged in" });
   }
 });
